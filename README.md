@@ -1,6 +1,7 @@
 ## Verification
 
 *Towards proving the safety and liveness properties in distributed systems*
+
 This repo summarizes the recent research on verifying and model checking distributed systems.
 
 # Repository Contents
