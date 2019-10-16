@@ -9,4 +9,4 @@ all:
 	-pdflatex -interaction=nonstopmode main.tex > /tmp/log3
 
 clean:
-	-rm *.aux *.log *.out main.pdf *.fls *.synctex.* *fdb_* 
+	-rm *.aux *.log *.out main.pdf *.fls *.synctex.* *fdb_* *.bbl *.blg 

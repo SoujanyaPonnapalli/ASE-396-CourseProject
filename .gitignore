@@ -1,0 +1,7 @@
+proposal/*.aux
+proposal/*.log
+proposal/*.out
+proposal/main.pdf
+proposal/*.fls
+proposal/*.synctex.*
+proposal/*fdb_*
