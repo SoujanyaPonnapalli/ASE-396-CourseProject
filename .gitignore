@@ -5,3 +5,5 @@ proposal/main.pdf
 proposal/*.fls
 proposal/*.synctex.*
 proposal/*fdb_*
+proposal/*.bbl
+proposal/*.blg
