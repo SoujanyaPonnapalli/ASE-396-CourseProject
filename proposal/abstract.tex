@@ -11,17 +11,21 @@ The advent of the Storage Class Memory (SCM) that is fast and byte-addressable
   in accordance to the memory model of the persistent memory and require
   applications to place fences to enforce ordering between these instructions.
   As fence and flush instructions incur heavy performance penalty and are
-  crucial for correctness, the application developers should not insert fences
-  unless they are strictly required for correctness. This tradeof between
-  performance and correctness complicates the design of persistent memory data
-  structures and makes it extremely hard to reason about their correctness.
+  crucial for correctness, the application developers should not insert these
+  instructions unless they are strictly required for correctness. This tradeof
+  between performance and correctness complicates the design of persistent
+  memory data structures and makes it extremely hard to reason about their
+  correctness.
 
 This paper aims at model checking persistent memory data structures for
-  correctness and crash consistency with a novel tool \emph{PM-Checker}.
-  PM-Checker verifies that the data structure does not allow any instruction
-  reorderings that can corrupt the data, and checks that crashing the data
-  structure at any random point in time will not leave the persisted data in an
-  inconsistent state. Overall, this paper models the persistent memory,
-  formulizes the specifications for correctness and crash consistency and
-  verifies state-of-the-art persistent memory data structures via PM-Checker.    
+  correctness and crash-consistency with a novel library. It introduces
+  PM-CHECKER library for the SPIN model checker that verifies that
+  a persistent memory data structure is correct, \ie it does not allow any
+  instruction reorderings that can corrupt the data. It also checks that the
+  persistent memory data structure is crash consistent, \ie the data
+  is never in an inconsistent state in the face of power failures or crashes.
+  Overall, PM-CHECKER models the relaxed memory model of persistent memory,
+  formalizes the specifications for correctness and crash consistency. We
+  demonstrate the use of PM-CHECKER by verifying a few state-of-the-art
+  persistent memory data structures.
 \end{abstract}
