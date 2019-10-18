@@ -1,1 +1,37 @@
 \section{Problem Definition}
+
+\vheading{Persistent Memory.} Persistent Memory or Non-Volatile Memory (NVM)
+provides byte-addressable and persistent memory at DRAM latencies. In other words,
+Persistent Memory allows concurrent accesses to the data at high speeds and
+guarantees that the data is persisted across system reboots or crashes. However,
+persistent memory comes with its challenges: NVM requires applications to use
+explicit cache flush instructions to ensure that the data reaches the persistent
+memory. Moreover, these flush instructions can be re-ordered with the loads and
+stores, requiring applications to use fence instructions to prevent correctness
+critical instructions to be executed in-order.
+
+\vheading{Complex Concurrent Indexes.} While fence and flush instructions ensure
+correctness and data durability, they introduce a lot of performance overhead.
+Also, with persistent memory the caches can be flushed at arbitrary times,
+making it harder to design a data structure that maintains data consistency
+across system crashes or failures.
+
+\vheading{\Checker library.} We introduce \checker, a model checking
+library for systematically verifying persistent memory data structures using
+model checking. \Checker is built on top of the SPIN model checking framework,
+using the Promela programming language. Other frameworks like TLA+ and languages
+like PlusCal will be considered for building \checker. \Checker should formalize
+the correctness and crash consistency properties of persistent memory data
+structures as ltl-formulaes and provide APIs for modeling and verifying
+persistent memory data structures.
+
+\vheading{Related Work.} There has been research on modeling and specifying
+relaxed memory models, which reorder instructions. Our work takes inspiration
+from prior work and builds on top of it. \Checker models crash consistency along
+with correctness. The prior work referred for building \checker is listed under
+References.
+
+\vheading{Verification Goals.} This paper aims at providing an extensible model
+checking library for verifying persistent data structures. On a high level, the
+goal is to verify state-of-the-art persistent data structures with minimal
+effort while providing some guarantees on the correctness and crash-consistency.
