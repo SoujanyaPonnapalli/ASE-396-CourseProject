@@ -1,2 +1,27 @@
 \begin{abstract}
+The advent of the Storage Class Memory (SCM) that is fast and byte-addressable
+  similar to the Random Access Memory (DRAM or SRAM) and is persistent like the
+  SSDs and hard disks, has attracted researchers to develop efficient data
+  structures for adopting this persistent memory. However building efficient
+  data structures for persistent memory that allow concurrent accesses to the
+  data is challenging for two main reasons:
+  1) The caches and registers remain volatile and require applications to flush
+  the data from the caches to the persistent memory for durability.
+  2) The cache flush instructions are reordered with load and store instructions
+  in accordance to the memory model of the persistent memory and require
+  applications to place fences to enforce ordering between these instructions.
+  As fence and flush instructions incur heavy performance penalty and are
+  crucial for correctness, the application developers should not insert fences
+  unless they are strictly required for correctness. This tradeof complicates
+  the design of persistent memory data structures and makes it extremely hard to
+  reason about their correctness.
+
+This paper aims at model checking persistent memory data structures for
+  correctness and crash consistency by building a \emph{PM-Checker}. PM-Checker
+  verifies that the data structure does not allow any instruction reorderings
+  that can corrupt the data, and checks that crashing the data structure at any
+  random point in time will not leave the persisted data in an inconsistent
+  state. Overall, this paper models the persistent memory, formulizes the
+  specifications for correctness and crash consistency and verifies
+  state-of-the-art persistent memory data structures.
 \end{abstract}
