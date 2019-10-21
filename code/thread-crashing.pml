@@ -1,35 +1,19 @@
-bit vol;
-bit nonVol;
-bit logger = 0;
 bit crash = 0;
 byte step = 1;
 
-active[1] proctype crashingThread () {
+active proctype crashingThread () {
   for (step : 1..4) {
     if
     ::  (step == 1) ->
-          // Writing to non-volatile memory
-          atomic {
-            nonVol = 1;
-            printf("Executing step-%d\n", step);
-          };
+          printf("Executing step-%d\n", step);
     ::  (step == 2) ->
-          // Flushing to volatile
-          atomic {
-            vol = 1;
-            printf("Executing step-%d\n", step);
-          };
+          printf("Executing step-%d\n", step);
     ::  (step == 3) ->
-          // Making it visible
-          atomic {
-            logger = 1;
-            printf("Executing step-%d\n", step);
-          };
+          printf("Executing step-%d\n", step);
     ::  (step == 4) ->
-          // Done execution
           atomic {
-            printf("Executing step-%d\n", step);
             printf("DONE!");
+            endHere:
             break;
           };
     ::  (step >= 1) ->
@@ -39,6 +23,7 @@ active[1] proctype crashingThread () {
             if
             ::  (crash == 1) ->
                 printf("Crashing at step-%d\n", step);
+                endHere:
                 break;
             :: else -> step--;
             fi;
