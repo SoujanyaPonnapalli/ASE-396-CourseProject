@@ -1,37 +1,50 @@
 \section{Problem Definition}
 
-\vheading{Persistent Memory.} Persistent Memory or Non-Volatile Memory (NVM)
-provides byte-addressable and persistent memory at DRAM latencies. In other words,
-Persistent Memory allows concurrent accesses to the data at high speeds and
-guarantees that the data is persisted across system reboots or crashes. However,
-persistent memory comes with its challenges: NVM requires applications to use
-explicit cache flush instructions to ensure that the data reaches the persistent
-memory. Moreover, these flush instructions can be re-ordered with the loads and
-stores, requiring applications to use fence instructions to prevent correctness
-critical instructions to be executed in-order.
+This section describes the problem statement that guides
+the rest of the work in this paper.
 
-\vheading{Complex Concurrent Indexes.} While fence and flush instructions ensure
-correctness and data durability, they introduce a lot of performance overhead.
-Also, with persistent memory the caches can be flushed at arbitrary times,
-making it harder to design a data structure that maintains data consistency
-across system crashes or failures.
+\vheading{Persistent Memory.} Persistent Memory (PM)) provides
+byte-addressable and persistent memory at DRAM latencies.
+In other words, PM allows high speed data accesses, while
+guaranteeing that the data is persisted across system reboots
+or crashes. However, persistent memory comes with its challenges:
+PM requires applications to use explicit cache flush instructions
+to ensure that the data reaches the persistent memory. Moreover,
+these flush instructions can be re-ordered with loads and stores,
+requiring applications to use fence instructions. Fences prevent
+correctness critical instructions to executed out-of-order.
 
-\vheading{\Checker library.} We introduce \checker, a model checking
-library for systematically verifying persistent memory data structures using
-model checking. \Checker is built on top of the SPIN model checking framework,
-using the Promela programming language. Other frameworks like TLA+ and languages
-like PlusCal will be considered for building \checker. \Checker should formalize
-the correctness and crash consistency properties of persistent memory data
-structures as ltl-formulaes and provide APIs for modeling and verifying
-persistent memory data structures.
+\vheading{Complex PM Indexes.} While fence and flush instructions
+ensure correctness and data durability, they result in a lot of
+performance overhead. To reduce the number of flushes and fences,
+PM-indexes are redesigned ground-up. This results in an increasingly
+complex PM index that is hard to reason about. In this paper, we
+look at WORT~\cite{201600}, a write
+optimized radix tree. This index is optimized for PM. The goal is
+to model the properties of PM and WORT to verify properties like
+crash consistency and/or in-order execution.
 
-\vheading{Related Work.} There has been research on modeling and specifying
-relaxed memory models, which reorder instructions. Our work takes inspiration
-from prior work and builds on top of it. \Checker models crash consistency along
-with correctness. The prior work referred for building \checker is listed under
-References.
+\vheading{Challenges in Verification}. The primary challenge in
+verifying PM indexes is modeling the behavior of PM itself. While
+PM indexes are implemented in a high-level object oriented language,
+the PM behavior is defined over the low-level assembly language with
+loads, stores, flushes, and fences. This implies that the PM index
+should be modelled only after understanding how it complies down to
+assembly code.
 
-\vheading{Verification Goals.} This paper aims at providing an extensible model
-checking library for verifying persistent data structures. On a high level, the
-goal is to verify state-of-the-art persistent data structures with minimal
-effort while providing some guarantees on the correctness and crash-consistency.
+\vheading{Related Work.} There has been research on modeling and
+verifying indexes built for relaxed memory models~\cite{
+    Lwn.net-Verify, Lwn.net-Spin, o2009model}.
+In RMMs, the instructions are reordered, similar to PM however,
+with different reordering constraints. For the rest of the paper,
+we first detail their method of modeling and verifying indexes.
+Next, we describe the adaptions required for modeling PM indexes.
+Finally, we aim at modeling WORT and verifying it for
+crash consistency.
+
+\vheading{Progress so far}. The progress has been in: 1) Identifying
+the core challenges of building a verification library for PM.
+2) With the realized challenges, finding new relevant work that can
+be built upon. 3) Understanding the techniques described
+in the recent work~\cite{o2009model} and 4) Parallelly, understanding the
+implementation of WORT~\cite{201600}.
