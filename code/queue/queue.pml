@@ -11,11 +11,7 @@
 #define DEQUEUESIZE 12
 #define RETVALSIZE 2
 #define malloc(X) X = cur ; cur++
-#define free(X) \
-atomic {
-  next[X] = UNDEF;
-  value[X] = UNDEF
-}
+#define free(X) atomic{ next[X] = UNDEF; value[X] = UNDEF}
 
 byte next[HEAPSIZE]; /* model of the heap */
 byte value[HEAPSIZE];
