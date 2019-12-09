@@ -1,30 +1,46 @@
 \begin{abstract}
-The advent of the Storage Class Memory (SCM), that is fast and byte-addressable
-  similar to Random Access Memory (DRAM or SRAM), and is persistent like SSDs
-  and hard disks, has attracted researchers to develop persistent memory data
-  structures to promote its adoption. However building efficient data
-  structures for persistent memory that allow concurrent accesses to the data
-  is challenging:
-  1) The caches and registers remain volatile, requiring data structures to use
-  explicit flush instructions to ensure that the data reaches persistent memory
-  2) The cache flush instructions can be reordered with load and store
-  instructions, requiring data structures to place fences between instructions
-  that have to execute in order for correctness. As fence and flush
-  instructions incur heavy performance penalty and are crucial for correctness,
-  the application developers should not insert these instructions unless they
-  are strictly required for correctness. This tradeof between performance and
-  correctness complicates the design of persistent memory data structures and
-  makes it extremely hard to reason about their correctness.
 
-This paper aims at model checking persistent memory data structures for
-  correctness and crash-consistency with a novel library. It introduces
-  \checker library for the SPIN model checker that verifies that
-  a persistent memory data structure is correct, \ie it does not allow any
-  instruction reorderings that can corrupt the data. It also checks that the
-  persistent memory data structure is crash consistent, \ie the data
-  is never in an inconsistent state in the face of power failures or crashes.
-  Overall, \checker models the relaxed memory model of persistent memory,
-  formalizes the specifications for correctness and crash consistency. We
-  demonstrate the use of \checker by verifying a few state-of-the-art
-  persistent memory data structures.
+Persistent Memory (PM) is a new storage medium that is fast like RAM and
+is non-volatile like hard disks and SSDs. The advent of PM has attracted
+researchers to build efficient PM indexes for promoting its adoption.
+However, buidling efficient PM indexes is challenging:
+1. The caches and registers are volatile.
+2. Cache flush instructions can be reordered with loads and stores.
+
+\vheading{PM caches remain volatile}. If a system crashes after the
+data hits the caches and before it reaches persistent memory, the
+system can restart with an inconsistent state on persistent memory.
+This necessitates the PM index to explicitly flush the cache-lines
+containing the data that is crucial for consistency.
+
+\vheading{Reordering of flushes with loads and stores}. Consider a PM
+index flushes the crucial data before performing other accesses to PM.
+Flushes alone cannot guarantee consistency as flushes can be
+reordered with the following load and store instructions. This phenomenon
+requires explicit ordering of operations. Foe example, a memory allocation
+should strictly be ordered before assigning a pointer to it to guarantee
+consistency and correctness. Such instructions are explicilty ordered
+using memory barries or fences.
+
+\vheading{Complexity and performance tradeoff}. While flushes and fences
+are crucial for correctness and crash consistency, they incur a lot of
+performance overhead. Developers, to tackle the performance penalties,
+redesign PM indexes to minimize the number of flushes and fences required.
+This tradeoff between correctness and performance complicates the design
+of PM indexes, making it extremely hard to reason about their correctness.
+
+\vheading{\checker}. In this paper, we demonstrate the use of model checking
+for reasoning about the correctness and crash consistency of complex PM indexes.
+We introduce \checker, a method to model and verify a PM index for data consistency
+in the face of crashes. Basically, it checks if the data is consistent given the
+reordering of flush instructions with loads and stores.
+
+\vheading{Outcomes and extended outcomes}. This paper details the modeling
+of a state-of-the-art PM index and verifying its crash consistency
+using model checking. Broadly, the extended goal of this work is to
+create an extensible model checking library for verifying PM indexes.
+The library should help verify the crash consistency of PM indexes
+with minimal effort.
+
+
 \end{abstract}

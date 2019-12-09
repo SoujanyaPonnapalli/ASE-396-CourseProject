@@ -1,0 +1,50 @@
+\section{Design Goals}
+
+PMChecker aims at verifying a concurrent persistent memory data structure
+for crash consistency and correctness.
+
+What is correctness?
+A persistent memory data structure is correct if all the safety critical
+operations are ordered using memory fence instructions.
+
+In detail, Persistent Memory controller reorders load and store instructions
+to optimize PM accesses. If a data structure requests a memory allocation
+and then writes a persistent memory pointer to the allocated memory,
+unless the data structure orders these operations with fences,
+the PM controller can reorder these operations, resulting in a corrupted
+state of the data structure.
+
+Re-ordering two instructions is okay if they operate idependently.
+Dependent operations might result in data corruption if reordered.
+PMChecker should check if the operations without fences are commutative.
+If the operations are commutative then there is no data corruption.
+But if not, then there is a potential race condition.
+What are the minimal set of re-orderings that PMChecker should consider?
+How can PMChecker eliminate false positives.
+
+PMChecker is designed to have the following goals.
+\begin{enumerate}
+	\item Little to no false positives
+	\item Should work with diverse implementations of 
+		persistent memory data structures
+	\item Should be easy to use similar to push-button verification,
+		with no or minimum developer involvement.
+	\item Should take advantage of the existing black-box and
+		white-box verification techniques.
+\end{enumerate}
+
+1) Correctness: Un ordered operations should be commutative
+Linearization points should be strictly ordered.
+Operations between linearization points should be commutative.
+2) Crash consistency: Isolation translates to crash consistency.
+3) Crash recovery: Operations should be idempotent in the recovery
+
+
+Linearization points: How to identify linearization points?
+Reordering capsules: What all reorderings to check?
+Commutative capsules
+Idempotent capsules
+
+How to construct a program graph and use the decades of research
+along the lines of model checking to construct the state space
+of PMChecker? 

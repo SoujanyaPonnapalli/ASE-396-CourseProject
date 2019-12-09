@@ -1,0 +1,37 @@
+\section{WORT}
+
+This section describes WORT~\cite{201600}, write-optimized
+radix tree. WORT is used in the rest of this work to describe
+the modeling of PM behavior and to verifying consistency properties.
+
+\vheading{Radix tree}. Several B-tree based indexing structures
+have been proposed for PM. These indexes focused on reducing the
+number of calls to the expensive memory fence and cache line flush
+instructions. They employ an append-only update strategy. However,
+these indexes require logging.
+
+The first contribution of WORT is showing the appropriateness of radix
+trees for indexing PM. As radix trees are structured around key prefixes,
+key comparisons are not required. Further, tree balancing and updates at
+node granularities are also not required. However, radix trees use memory
+inefficiently. To overcome this limitation, radix trees employ path-compression
+algorithms. This optimization combines multiple tree nodes that form a unique
+tree path into a single node. As path compression requires node split and
+merge operations, it is detrimental for PM.
+
+\vheading{Write optimized radix tree}. The second contribution of WORT is
+the desing of an efficient write-optimized, path compression algorithm for
+radix trees. In this paper, we model and verify the path-compressed and
+write-optimized radix tree for PM.
+
+\section{Timeline}
+
+In this section, we describe a timeline based plan for the rest of the semester.
+The plan is guided by the following three short term goals, each taking 1-2 weeks.
+
+\begin{itemize}
+\item Convert WORT into machine-level language and derive the data dependencies.
+\item Model the dependencies using the techniques described in SPEC. While modeling WORT,
+SPEC has to be adapted to capture the memory model of PM.
+\item Alongside, instruction reordering, try reasoning about the crash consistency of WORT.
+\end{itemize}
