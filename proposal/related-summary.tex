@@ -1,0 +1,58 @@
+\section{Discussion}
+
+\vheading{State space exploration of concurrent algorithms under weak memory orderings}.
+This section briefly discusses the techniques used in the most relevant previous work.
+Similar to our work where we consider Persistent Memory (PM) storage that reorders load
+and store instructions with flushes, the relevant work considers relaxed memory models.
+It looks at how concurrent, lock-free data structures like queues and maps behave when
+exposed to a weak memory model, inline with our goal which attempts at examining the
+behavior of data structures like radix trees on PM.
+
+\vheading{Goals}. Analyzing the correctness of data structure algorithms under weak memory
+consistency models using model checkers to find correctness violations. First, the algorithms
+are transformed into a known set of statements that can be reordered under the assumed
+weak memory consistency model. Next, the transformed algorithms are analyzed by a model checking
+tool by enumerative exploration of the reorderings. Finally, the correctness violations are
+reported with an execution trail of the concurrent algorithms. These steps are explained through
+an example of a queue with a concurrent enqueue and dequeue operation.
+
+\vheading{Details}. Let us deep dive into understanding the problem statement and the solution
+of the relevant work. The detailed in three steps. First, we will understand the specifics of
+weak memory consistency models. Then, we will understand the queue implementation. Finally, we
+will look into the details of their solution involving model checkers.
+
+\emph{Weak memory models}. Most commonly used multiprocessor architectures use weak memory models.
+In these models, a processor might reorder loads and stores of the same thread if they target
+different memory addresses. A processor might also buffer the stores in a store buffer, delaying
+the resultant effects to the other threads or cores. To avoid any race conditions, some algorithms
+use locks to synchronize operations between processor cores. Such algorithms are easy to reason about
+as their execution interleavings follow the semantics of a sequentially consistent memory model.
+
+\emph{Concurrent data structures}. Most commonly used concurrent implementations of data structures like
+queues, maps, or sets do not follow locking principles due to their heavy synchronization overheads.
+As these algorithms use lock-free synchronization, they are susceptible to subtle implementation bugs.
+These algorithms use explicit fence instructions to avoid the reordering of correctness critical
+operations. While the lack of fences results in incorrect behavior, an overzealous use of fences
+impacts performance.
+
+\emph{Verification}. The relevant work attempts at verifying the correctness or finding correctness bugs
+in the implementation of concurrent data structures that do not rely on locking principles. The absence
+of locks means that the standard race detection tools are of little use. Therefore they adapt the
+existing verification techniques to handle weak memory models. They adapt SPIN, a model checking framework
+to handle weak memory models. In particular, they demonstrate how models can be designed to use SPIN that
+is designed to handle sequentially consistent  memory models. They show how Promela models can be adapted
+to represent all possible computations under a weak memory model.
+
+\emph{Modeling}. Any program execution is a series of load and store operations with barriers, that change
+the state of the main memory. In relaxed memory models, load instructions see the stores to the same memory
+address. However, it is non-trivial to understand what other store operations would a load instruction see.
+To represent the relaxed memory model, they define the following terms:
+\begin{enumerate}
+	\item Partial order: A total order of all the instructions of a single thread
+	\item Total order: An intuitive ordering of how all the instructions reach the main memory
+\end{enumerate}
+To model an algorithm for weak memory models, they first consider the relaxed memory model introduced
+by Park and Dill \cite{}. It preserves the single-thread semantics, by defining dependency ordering between
+data dependent operations.
+
+\emph{Implementation}.

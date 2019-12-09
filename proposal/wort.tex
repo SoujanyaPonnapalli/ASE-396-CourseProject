@@ -7,29 +7,31 @@ the modeling of PM behavior and to verifying consistency properties.
 \vheading{Radix tree}. Several B-tree based indexing structures
 have been proposed for PM. These indexes focused on reducing the
 number of calls to the expensive memory fence and cache line flush
-instructions. They employ an append-only update strategy. Such
-strategies have been shown to significantly reduce duplicate copies
-needed for schemes such as logging resulting in improved performance.
-However, this strategy does not allow these indexes to retain one of
-the key features of B-trees, that is, having the keys sorted. Moreover,
-this strategy is insufficient in handling node overflows as node splits
-involve multiple node changes, making logging necessary.
+instructions. They employ an append-only update strategy. However,
+these indexes require logging.
 
-The first contribution of WORT is showing the appropriateness and the
-limitation of radix trees for PM. That is, since the radix tree structure
-is determined by the prefix of the inserted keys, the radix tree does not
-require key comparisons. Furthermore, tree rebalancing operations and
-updates in node granularity units are also not necessary. Instead,
-insertion or deletion of a key results in a single 8-byte update operation,
-which is perfect for PM. However, the traditional radix tree is known
-to poorly utilize memory and cache space. In order to overcome this limitation,
-the radix tree employs a path compression optimization, which combines
-multiple tree nodes that form a unique search path into a single node.
-Although path compression significantly improves the performance of the
-radix tree, it involves node split and merge operations,
-which is detrimental for PM.
+The first contribution of WORT is showing the appropriateness of radix
+trees for indexing PM. As radix trees are structured around key prefixes,
+key comparisons are not required. Further, tree balancing and updates at
+node granularities are also not required. However, radix trees use memory
+inefficiently. To overcome this limitation, radix trees employ path-compression
+algorithms. This optimization combines multiple tree nodes that form a unique
+tree path into a single node. As path compression requires node split and
+merge operations, it is detrimental for PM.
 
 \vheading{Write optimized radix tree}. The second contribution of WORT is
 the desing of an efficient write-optimized, path compression algorithm for
 radix trees. In this paper, we model and verify the path-compressed and
 write-optimized radix tree for PM.
+
+\section{Timeline}
+
+In this section, we describe a timeline based plan for the rest of the semester.
+The plan is guided by the following three short term goals, each taking 1-2 weeks.
+
+\begin{itemize}
+\item Convert WORT into machine-level language and derive the data dependencies.
+\item Model the dependencies using the techniques described in SPEC. While modeling WORT,
+SPEC has to be adapted to capture the memory model of PM.
+\item Alongside, instruction reordering, try reasoning about the crash consistency of WORT.
+\end{itemize}
