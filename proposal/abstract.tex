@@ -1,28 +1,28 @@
 \begin{abstract}
 
-  Persistent Memory (PM) is a new storage class medium that has two properties:
-  i) persistence and ii) fast byte-addressable access. Persistent Memory allows
-  applications to store data persistently, ie., safely across sytem crashes or
-  power failures. Along with non-volatile storage, PM allows applications to
-  access the stored data with loads and stores at low latencies. Simply put, PM
-  combines the best of two worlds: persistence from secondary storage like hard
-  disks and fast byte-addressable access from main memories like DRAM.
-  The advent of PM has attracted researchers to build fast and efficient indexes
-  that allow easy access to this new storage medium. However, designing
-  concurrent indexes and getting them right is a hard task.
+  Persistent Memory (PM) is a new storage class medium that allows fast
+  and byte-addressable access to persistent data. Persistent Memory allows
+  applications to store data safely across system crashes and power failures.
+  Along with persistent storage, PM allows applications to access data using
+  load and store instructions at low latencies. In simple terms, PM combines
+  the best of two worlds: persistent storage from secondary storages like hard
+  disks and fast byte-addressable access from non-volatile mediums like DRAM.
+  The advent of PM has attracted researchers to build fast and efficient
+  indexes that allow easy access to PM. However, designing concurrent,
+  high-throughput indexes is hard to get right.
 
-  As concurrent PM-indexes have complex implementations, it is hard to reson
-  about their correctness. There are test-suites and frameworks that allow
-  developers to test their implementation of these indexes. However, testing is
-  incomplete and does not provide any guarantees on the properties of the index.
-  In this paper, we first identify the need to verify the correctness and
-  persistence of  PM indexes. We then propose techniques to model check these
-  indexes. In detail, we model the indexes to capture all the possible
-  executions like crashes and instruction reorderings. We then specify the data
-  structure properties that should hold despite crashes and instruction
-  reorderings. Finally using model checking tools, we verify that these indexes
-  guarantee certain correctness properties. We demonstrate our techniques on two
-  concurrent data structures: a locking queue and a non-blocking queue. We
-  verify the serializability of enqueue and dequeue operations.
+  In this paper, we first identify the need for verifying concurrent indexes.
+  As concurrent PM indexes have complex implementations, it is hard to reason
+  about their correctness. While there are test-suites and frameworks that
+  allow developers to test their implementations, testing is incomplete and it
+  does not provide any guarantees on the properties of these concurrent index.
+  We then propose techniques to use model checking to verify these indexes. In
+  detail, we propose techniques to build a model of the index that captures all
+  possible executions including crashes and instruction re-orderings. Next, we
+  specify the data structure properties that should hold despite crashes and
+  instruction re-orderings. Finally, using model checking tools, we verify that
+  these indexes guarantee certain invariants. We demonstrate our techniques on
+  two concurrent data structures: a locking queue and a non-locking queue. We
+  verify the serializability of enqueue and dequeue operations of the queue.
 
 \end{abstract}
