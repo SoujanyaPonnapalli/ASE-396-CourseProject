@@ -1,0 +1,116 @@
+\section{Introduction}
+
+% Persistent Memory
+Persistent Memory is a new storage class medium that is fast like Dynamic
+Random Access Memory (DRAM) and is persistent like Hard Disk Drives (HDD) or
+Solid State Drives (SSD). Persistent Memory (PM) provides fast
+byte-addressable access to persistent data. With the advent of PM, researchers
+are building fast and efficient data structures, also termed PM indexes, for
+accessing data on PM.
+
+% Concurrent PM indexes
+PM indexes should provide high throughput and low latencies to access PM data.
+Apart from providing high performance, they also should be correct and crash
+consistent. Correctness of the index guarantees that irrespective of how many
+concurrent threads operate on the index, the data on PM is never corrupted.
+Crash consistency of the index ensures that independent of when there is a
+crash or a system failure, the index can recover to a consistent state of the
+data on PM. Overall, it is important that PM indexes provide high performance
+alongside being correct and crash consistent.
+
+% Properties of PM
+However, designing PM indexes involves trading off performance for correctness.
+In particular, Persistent Memory allows load store instruction re-ordering. If
+these re-orderings are critical to the correctness of the data, then the index
+should explicitly place barriers which ensures that the instructions before the
+barrier are executed before the instructions after the barrier. These barrier
+instructions, also termed fences, add extra latency.
+
+Further, PM indexes also have to tolerate some performance overhead to ensure
+crash consistency. PM indexes cannot ensure that the data written via a store
+is persisted unless they perform an explicit cache line flush followed by a
+fence, to ensure that data can survive a crash there after. Like fences, flushes
+also contribute to the performance overhead.
+
+% Complexities of PM indexes
+PM indexes need explicit flush and fence instructions to ensure correctness and
+crash consistency of the data on PM. But, an overzealous use of flushes and
+fences will add a lot of performance overhead to PM indexes. To this end,
+concurrent PM indexes are designed to minimize the use of flushes and fences
+while guaranteeing correctness and crash consistency, thereby complicating
+the implementation of these indexes.
+
+% Verifying PM indexes
+Complex implementations of PM indexes make it hard to reason about the
+correctness and the crash consistency of PM indexes. To alleviate this problem
+there are numerous test suites and crash consistency frameworks that allow
+developers to test the concurrent PM index. However, testing is incomplete or
+is not exhaustive. It does not provide any guarantees on invariants like
+data correctness or crash consistency.
+
+% Need for verification
+In this paper, we first
+identify the need to verify the correctness or crash consistency properties
+of a concurrent PM index. Unlike concurrent DRAM indexes, PM indexes should
+further ensure the crash consistency of the persisted data. The PM index
+should allow threads to recover to a consistent state in the face of a crash or
+a power failure, resulting in a much more complicated index design.
+
+% Our solution
+Next,
+we propose techniques to model check the correctness and crash consistency of
+PM indexes. We use model checking tools that systematically explore the state
+space of possible executions to find an execution trail that violates the
+property specifications. In particular, we propose modeling the PM index in
+such way a way that all possible instruction re-orderings and all possible
+crashing scenarios are enumerated by the model checking tool. This method
+allows developers to guarantee that any code that fits the model, guarantees
+correctness and crash consistency.
+
+% Implementation
+To present our techniques to model two concurrent persistent data structures:
+a locking queue, and a non-locking queue. We detail the modeling of these data
+structures by allowing instruction re-ordering and crashing using the
+non-determinism constructs present in the Promela modeling language. We then
+show how correctness and consistency properties can be defined on the persisted
+data. Finally, we verify these models using SPIN, a model checking tool.
+
+% Properties
+More specifically, we verify that the concurrent enqueue and dequeue operations
+don't corrupt the data in the underlying queue. Further we ensure that the data
+reaching PM is consistent or no partial data is written in the face of crashes.
+We use the model checking framework to simulate possible instruction reoderings
+as allowed in the model. If there are any execution trails that violate these
+properties they are outputted by the model checking framework.
+
+% Limitations and Future work
+Our solutions are not without their limitations. For complex and intricate data
+structures like dynamic trees or heaps, model checking using the enumeration of
+the execution state space including instruction re-ordering and crashing could
+become quite expensive. While state space explosion is a significant problem
+in our solution, we shall address it in our future work. We shall also explore
+modeling more complex data structures apart from queues in our follow up. Our
+work, shows how existing model checking tools can be used to verify the
+correctness and crash consistency of PM indexes.
+
+% Key contributions
+This paper discusses techniques to model check PM indexes. The key
+contributions of this paper are:
+\begin{enumerate}
+    
+    \item Summarizing the existing work on model checking DRAM indexes when
+    exposed to relaxed memory models (RMMs). RMMs reorder load and store
+    instructions similar to PM. However, RMM indexes do not persist data and
+    hence do not have to notion of crash consistency like PM indexes.
+
+    \item Detailed explanation of our modeling techniques using two persistent
+    and concurrent data structures: a locking and a non-locking queue. We
+    present ways to enumerate instruction re-ordering and random crashing using
+    the non-determinism constructs of Promela, a model checking language.
+
+    \item Specifying and verifying the serializablity of the concurrent
+    operations of the two queues, using SPIN, a model checking framework.
+
+    \item We open source our implementations and encourage contribution.
+
+\end{enumerate}
