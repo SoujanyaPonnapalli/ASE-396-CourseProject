@@ -1,0 +1,157 @@
+\section{Implementation}
+
+The implementations of the above-mentioned data structures are open sourced
+\footnote{https://github.com/SoujanyaPonnapalli/ASE-396-CourseProject}.
+In this section, I will describe the modeling techniques using the
+concurrent two-locking queue.
+
+\subsection{Concurrent Queue With Two Locks}
+A queue with concurrent enqueue and dequeue operations is described below.
+The queue is implemented using two reader-writer locks. The details are
+explained below:
+
+\vheading{Queue Metadata}:
+While a queue is like a linked list, it follows the first in first out (FIFO)
+policy. Enqueuing happens at the tail and dequeueing happens at the head. Each
+queue node stores a value and a pointer to its next node.
+
+The queue maintains four main variables as a part
+of its metadata. The first is a pointer to the head of the queue (head). Second is
+a pointer to the tail of the queue (tail). Next is a lock guarding the head pointer
+(headlock). And finally a lock guarding the tail of the queue (taillock). The head,
+tail, headlock, and taillock together form the queue.
+
+\vheading{Initialization}:
+The head and tail point to a dummy initial node. The headlock and taillock are
+initialized to zero. If a threads acquires the headlock or the taillock, it is
+assigned to one. Subsequently, other threads attempting to acquire the same
+lock are denied access. After the thread holding the lock releases it (if headlock
+points to zero), the next thread acquiring the lock succeeds.
+
+\vheading{Enqueue}: The thread executing the enqueue(val) operation first creates
+a new node. It then assigns the new nodes value to val and assigns the next pointer
+to NULL. Then the thread attempts to acquire the taillock, until it succeeds. Once
+it acquires the lock, it points the tail nodes next pointer to the newly created node.
+Finally it points the queue's tail pointer to the next node and releases the taillock.
+
+\vheading{Dequeue}: The thread executing the dequeue operation first creates a new node
+and a new pointer. Then the thread attempts to acquire the headlock until it succeeds.
+Once it acquires the headlock, it assigns the current head's value to the new node's
+value. Then it forwards the current head to point to its next node. It then unlocks the
+headlock. Finally, it returns the new node with the dequeued value to the user.
+
+The pseudo code for the concurrent two-lock queue is presented below:
+\input{pcode-lockingQ}
+
+
+\subsection{Modeling the Two-Lock Queue}
+
+Now, we will look at modeling the two lock queue. Our goal here is that,
+we want the model checker to enumerate and verify executions with all possible
+re-orderings of instructions. Note that the code above is now represented as multiple
+statements each with a single load and a single store instruction. Next, we will capture
+the dependencies, and model the possibility of re-orderings using the Promela's "do"
+construct that introduces non-determinism to the code.
+
+\vheading{Non-determinism}: We use the Promela's repetition construct "do od". Like all
+other control-flow constructs, it is a convenient method to define the structure of the
+underlying automaton. This construct has a single start and a stop state. Each option in
+the sequence represents an outgoing transition in for the start state. At the end of the
+execution of an option, the control reaches the start state allowing for repeated execution.
+A stop statement can be reached via a break statement.
+
+\vheading{Capturing dependencies}: Using the above-mentioned "do od" construct, the
+possible instruction re-orderings are embedded into the Promela model. After a statement
+is executed, any statement until the next fence instruction can be executed. The executed
+statements are tracked using a marker array, named done. Once the possibly re-ordered
+instructions are all executed, the "do od" repetition ends and the model executes the next
+set of instructions that can potentially be re-ordered.
+
+\subsubsection{Promela code}
+Now that we understand how the Promela model captures the re-orderings, we will now look
+into how the queue is modeled. 
+
+\vheading{Heap and Global variables}: The nodes are allocated on heap. To this end, there
+are two arrays which capture the values and the next pointers. Next, for the nodes that
+are allocated on the heap using malloc are given indexes. The heap allocator is a global
+variable curr that captures the variables position on the heap.
+
+\vheading{Queue Metadata}: Next the heap pointer and the tail pointer are variables
+storing the position of the head and the tail on the heap. Next the headlock and the
+taillock are modeled using bits that represent if the lock is acquired or not. Any
+pointer to a node, similar to the head and tail pointers, store the position of the
+node on the heap.
+
+\vheading{Initialization}: The initialization code is fairly executed in any possible
+order. So there is a done array of the size equal to the number of statements in the
+init queue code. Each statement is up for execution after the first step. In the first
+step a dummy node is created on the heap. And in the next step either of the
+head or tail or their corresponding lock initializations are possible.
+
+\vheading{Enqueue and Dequeue}: Similar to the initialization code, the enqueuing and
+dequeuing code have a done array each to track the executed statements. Next, in the
+Next the model introduces conditional execution using the information of executed
+statements from the done array. For example, if the dependent statements are executed,
+a particular statement is ready for execution. This introduces non-determinism between
+all the possible executable statements at any point in time. The model checker inevitably
+will search through the entire state space for potential specification violations.
+
+\vheading{Serializability of operations}: The property we want to verify is that despite
+how the execution of the concurrent enqueue and dequeue operations proceed, the ultimate
+result should be either a resultant of performing an enqueue before a dequeue or vice versa.
+Any queue state that is not a resultant of a possible serialization of enqueue and dequeue
+is a corrupted, incorrect state. We use the Promela "assert" construct to specify the
+invariant.
+
+\input{promela-locking}
+
+\subsection{Introducing Crashes in Promela}
+
+With the above example, we see a Promela model that is designed to explore the
+state space of the possible re-orderings of instructions. Mainly, we use the
+non-determinism inducing Promela construct "do od" to capture the instruction
+re-orderings. We also describe the correctness of the enqueue and dequeue
+operations using the "assert" construct.
+
+PM indexes, apart from correctness, should also guarantee crash consistency.
+As the easiest to reason about is when all the variables stored are persistent,
+we proceed with the same assumption.
+
+Under the assumption that every variable is on persistent memory and it is written
+persistently using the required flushes and fences, we want to explore how to
+simulate crashes in Promela. To simulate crashes, we use the "select" construct
+of Promela.
+
+\vheading{Crashes}: Using a non-deterministic select operator, which allows the
+value of a variable to be selected from a range of values, we simulate crashes.
+First, we introduce a new variable named crash. We then select a value from zero
+or one and assign it to crash. If the value of crash is one, then all the volatile
+variables are assigned to NULL and the execution is returned to the start of the
+"do od" construct. Once the next statement is executed and the crash value is one,
+then recovery code is executed and crash value is re-assigned to zero. Once the crash
+value is zero again, we explore the possibility of facing a crash again.
+
+\vheading{Persistence properties}: In the face of crashes, the PM index should be
+able to recover correctly. So by simulating crashes and modeling the recovery code
+we again check if the enqueue and dequeue operations are serializable. This completes
+the verification of a PM index like a queue for both correctness and crash consistency.
+
+\vheading{Implementation}: We show how crashes can be simulated in a small code snippet
+below. This captures the gist of how crashes are simulated. The recovery code is modeled
+as per the data structures persistent and volatile variables.
+
+\input{thread-crashing}
+
+\vheading{Summary}: Overall, for the locking-queue
+we model crashes in crashing-queue.pml and verify the serializability of its
+enqueue and dequeue operations. The underlying
+assumption is that all the queue variables are on persistent data. However, this assumption
+can be weakened to generate more complex models. Moreover, other fine-grained properties
+can also be verified. We also show how a non-blocking queue, with concurrent enqueue
+and dequeue operations, that does not use locks, can be verified for correctness and crash
+consistency in the open sourced link~\footnote{https://github.com/SoujanyaPonnapalli/ASE-396-CourseProject/tree/master/code/nonblocking-queue}.
+
+For each of the locking and non-blocking queues, we have the code (queue.c),
+the model (queue.pml), persistent model (crashing-queue.pml). The only property
+verified for now is the serializability of the concurrent enqueue and dequeue
+operations on the queues.

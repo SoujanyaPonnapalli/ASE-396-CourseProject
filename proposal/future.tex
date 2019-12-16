@@ -1,0 +1,19 @@
+\section{Conclusion and Future Work}
+
+This paper presents the verification of PM indexes. PM indexes can be modeled
+using the non-determinism constructs in Promela, to allow the enumeration of
+possible instruction re-orderings and crashes. Despite the re-orderings or
+the crashes, the invariants of the PM index that should hold are modeled as
+specifications.
+
+As an extension to the current work, I would like to first model the current
+queues under weaker assumptions. For example, assuming non-trivial recovery
+code for the queues will add some complexity to the model. So, as a first step,
+I would like to explore this aspect of these data structures.
+
+Next, I would like to explore modeling more complex PM indexes~\cite{LeeEtAl19-Recipe}.
+For example, the most interesting data structure that is currently of very high interest
+to me is the write-optimized Radix tree (WORT)~\cite{201600}. WORT has complex node-split
+and join operations which makes modeling it a significantly involved task.
+However, verifying is correctness and crash consistency along with some
+structural invariants is the follow-up to this work.

@@ -50,6 +50,7 @@
 \input{macros}
 
 \usepackage{ifthen}
+\usepackage{fancyvrb}
 \newboolean{publicversion}
 \setboolean{publicversion}{false}
 \ifthenelse{\boolean{publicversion}}{
@@ -79,6 +80,9 @@
 \maketitle
 
 \input{intro}
+\input{background}
+\input{code}
+\input{future}
 %\input{problem}
 %\input{related}
 %\pagebreak

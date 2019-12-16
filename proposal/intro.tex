@@ -79,7 +79,7 @@ data. Finally, we verify these models using SPIN, a model checking tool.
 More specifically, we verify that the concurrent enqueue and dequeue operations
 don't corrupt the data in the underlying queue. Further we ensure that the data
 reaching PM is consistent or no partial data is written in the face of crashes.
-We use the model checking framework to simulate possible instruction reoderings
+We use the model checking framework to simulate possible instruction re-oderings
 as allowed in the model. If there are any execution trails that violate these
 properties they are outputted by the model checking framework.
 

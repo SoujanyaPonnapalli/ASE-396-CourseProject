@@ -1,0 +1,93 @@
+\section{Background}
+
+This section describes the relevant work on model checking data structures that
+are exposed to relaxed memory models (RMMs) ~\cite{burnim2011testing,
+Jonsson:2009:SEC:1556444.1556453}. This work is builds on the techniques
+introduced by Bengt Jonsson et. al., ~\cite{Jonsson:2009:SEC:1556444.1556453}.
+
+\subsection{State-Space Exploration for Concurrent Algorithms under Weak Memory
+ Models}
+
+This work introduces techniques to use state-space exploration to verify
+concurrent algorithms when exposed to weak memory orderings. They demonstrate
+their techniques on a concurrent locking queue as introduced by burckhardt et.
+al., in ~\cite{burckhardt2007checkfence, article}.
+
+\vheading{Goals}: This work aims at analyzing the correctness of the algorithms
+of concurrent data structures that can be exposed to weak memory
+consistency models. This work proposes the use of model checkers to verify
+the correctness properties of these algorithms. They introduce the concept
+of using the non-determinism constructs in Promela to enumerate the state space
+of the possible instruction re-orderings. They show how algorithms can be
+transformed into models that allow the enumerative exploration of instruction
+re-orderings. Using the model checking tool SPIN, they verify the correctness
+of these algorithms. Also, they use the model checker to indicate the correctness
+violations. SPIN provides execution trails, if any, that violate the correctness
+specification.
+
+\vheading{Relaxed Memory Models}: This work explores the scenario where the resultant
+load and store instructions from a data structure can be reordered as per the weak
+memory consistency model. Most commonly used multiprocessor architectures use weak
+memory models. In these models, a processor might reorder loads and stores of the
+same thread if they target different memory addresses. A processor might also buffer
+the stores in a store buffer, delaying the resultant effects to the other threads or
+cores. To avoid any race conditions, some algorithms use locks to synchronize
+operations between processor cores. Such algorithms are easy to reason about
+as their execution interleavings follow the semantics of a sequentially consistent
+memory model.
+
+\vheading{Need for verification}: Similar to the reasons for why we believe that it
+is important to verify PM indexes, this work advocates the verification of data
+structures that can be exposed to weak memory models. The primary reason they mention
+is the fact the complexity of the concurrent data structures. The second reason is that
+having many concurrent threads and numerous possible instruction re-orderings can
+make the reasoning of the correctness of the data structure hard. Finally, testing the
+data structure is not complete. They provide corroborating research that finds bugs
+in well tested concurrent data structures.
+
+\vheading{State space exploration}: This work attempts at finding correctness bugs in
+concurrent data structures when exposed to weak memory consistency model. They propose
+techniques which are extensible to non-locking queues. Without locks, traditional
+race detection tools are of little use. Therefore they propose solutions which use
+existing verification frameworks like SPIN. SPIN~\cite{Lwn.net-Spin,Lwn.net-Verify}
+is a model checking framework that was designed to handle sequentially consistent
+memory models. In particular, this work demonstrates how Promela models can be designed
+to use SPIN. They show that Promela models can can be adapted to represent all possible
+computations under a weak memory model. They use the non-determinism constructs of
+Promela to enumerate these possible computations.
+
+\vheading{Technical Details}
+Any program execution is a series of load and store operations with barriers,
+that change the state of the main memory. In relaxed memory models, load
+instructions see the stores to the same memory address. However, it is
+non-trivial to understand what other store operations would a load instruction
+see. To represent the relaxed memory model, they define the following terms:
+\begin{enumerate}
+	\item Partial order: A total order of all the instructions of a single thread
+    \item Total order: An intuitive ordering of how all the instructions reach
+    the main memory
+\end{enumerate}
+To model an algorithm for weak memory models, they first consider the relaxed
+memory model introduced by Park and Dill. It preserves the single-thread
+semantics, by defining dependency ordering between data dependent operations.
+
+After capturing the dependencies between the loads and stores using the partial
+and total program order, they propose introducing these dependencies into the
+Promela model. By using non-deterministic constructs, they propose simulating
+the re-ordering of data independent instructions. This way their solution does
+an enumerative exploration of the instruction reorderings.
+
+\vheading{Extensions}: Although the current paper aiming at verifying the
+correctness and crash consistency of PM indexes is inspired from their work,
+it is different from their work in two different ways:
+
+\emph{Non-blocking queue}: While their solutions are demonstrated on a simple
+queue that uses two-locks that restrict access to the threads enqueuing and
+dequeuing values, this work extends it to non-blocking lock-less concurrent
+queue.
+
+\emph{Crashing semantics}: While their work evaluates only the correctness of
+a locking queue, our work introduces the concept of persistence. It proposes a
+method to simulate crashes and introduce non-trivial recovery code in to the
+queue. It demonstrates the techniques on both the locking and the lock-less
+concurrent queue algorithms.
